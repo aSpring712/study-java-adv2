@@ -1,0 +1,28 @@
+package annotation.basic.inherited;
+
+import java.lang.annotation.Annotation;
+
+/**
+ * Inherited Main
+ *
+ * @author Kwon Bomi / GitHub: aSpring712
+ * @since 2025-06-04
+ * @version 1.0
+ */
+public class InheritedMain {
+
+	public static void main(String[] args) {
+		print(Parent.class);
+		print(Child.class);
+		print(TestInterface.class);
+		print(TestInterfaceImpl.class);
+	}
+
+	private static void print(Class<?> clazz) {
+		System.out.println("class: " + clazz);
+		for (Annotation annotation : clazz.getAnnotations()) {
+			System.out.println(" - " + annotation.annotationType().getSimpleName());
+		}
+		System.out.println();
+	}
+}
