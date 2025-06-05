@@ -7,6 +7,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import java.util.HashMap;
 import java.util.Map;
 
+import static util.MyLogger.log;
+
 /**
  * HTTP Request
  *
@@ -25,6 +27,7 @@ public class HttpRequest {
 		parseRequestLine(reader);
 		parseHeaders(reader);
 		// 메시지 바디는 이후에 처리
+		parseBody(reader); // 추가
 	}
 
 	private void parseRequestLine(BufferedReader reader) throws IOException {
@@ -61,6 +64,28 @@ public class HttpRequest {
 			String[] headerParts = line.split(":");
 			// trim() 앞 뒤에 공백 제거
 			headers.put(headerParts[0].trim(), headerParts[1].trim());
+		}
+	}
+
+	// 추가
+	private void parseBody(BufferedReader reader) throws IOException {
+		if (!headers.containsKey("Content-Length")) {
+			return;
+		}
+
+		int contentLength = Integer.parseInt(headers.get("Content-Length"));
+		char[] bodyChars = new char[contentLength];
+		int read = reader.read(bodyChars);
+		if (read != contentLength) {
+			throw new IOException("Failed to read entire body. Expected " + contentLength + " bytes" +
+					", but read " + read);
+		}
+		String body = new String(bodyChars);
+		log("HTTP Message Body: " + body);
+
+		String contentType = headers.get("Content-Type");
+		if ("application/x-www-form-urlencoded".equals(contentType)) {
+			parseQueryParameters(body);
 		}
 	}
 
